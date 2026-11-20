@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-image
+  labels:
+    chaos: "true"
+spec:
+  containers:
+    - name: app
+      image: nginx:does-not-exist

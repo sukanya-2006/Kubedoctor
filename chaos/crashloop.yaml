@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crasher
+  labels:
+    chaos: "true"
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: ["sh", "-c", "echo 'DB_URL missing, exiting' && exit 1"]
