@@ -53,10 +53,13 @@ def describe_pod(pod, namespace="default"):
     p = v1.read_namespaced_pod(pod, namespace)
     return {
         "phase": p.status.phase,
-        "containers": [
+                 "containers": [
             {
                 "name": c.name,
                 "image": c.image,
+                "command": c.command,
+                "args": c.args,
+                "env_vars_set": [e.name for e in (c.env or [])],
                 "resources": c.resources.to_dict() if c.resources else {},
             }
             for c in p.spec.containers

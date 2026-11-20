@@ -1,0 +1,7 @@
+kubernetes
+mcp[cli]
+fastapi
+uvicorn
+groq
+python-dotenv
+requests

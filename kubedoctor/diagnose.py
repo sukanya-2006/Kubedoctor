@@ -23,14 +23,17 @@ HINTS = {
 
 SYSTEM = """You are a Kubernetes SRE helping a beginner.
 You are given evidence about one failing pod.
+Rules:
+- Read the "logs" first. If the logs contain an error message, that is usually the root cause.
+- Only make claims about things that appear in the evidence. Never assume a setting is missing
+  unless the evidence shows it is missing.
+- Quote exact log or event lines in "evidence".
 Reply with ONLY a JSON object, no other text, with these keys:
   "root_cause": one or two plain-English sentences,
   "category": one of ImagePull, CrashLoop, OOMKilled, Config, Scheduling, Other,
   "evidence": a list of the exact log or event lines that support your answer,
   "suggested_fix": concrete steps to fix it,
-  "confidence": "low", "medium" or "high".
-Use only the evidence given. If it is not enough, say so and use low confidence."""
-
+  "confidence": "low", "medium" or "high"."""
 
 def _reason_for(pod, namespace):
     for item in k.list_unhealthy_pods(namespace):
@@ -48,16 +51,16 @@ def diagnose(pod, namespace="default"):
     reason = _reason_for(pod, namespace)
     evidence = {
         "pod": pod,
+        "logs": k.get_pod_logs(pod, namespace)[-2000:],
         "status_reason": reason,
         "hint": HINTS.get(reason, ""),
         "describe": k.describe_pod(pod, namespace),
         "events": k.get_pod_events(pod, namespace)[-15:],
-        "logs": k.get_pod_logs(pod, namespace)[-2000:],
     }
     resp = client.chat.completions.create(
         model=MODEL,
         temperature=0,
-        max_tokens=800,
+        max_tokens=2000,
         messages=[
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": json.dumps(evidence, default=str)},
