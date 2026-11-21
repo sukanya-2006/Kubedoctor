@@ -1,0 +1,70 @@
+[
+  {
+    "scenario": "bad-tag",
+    "status": "ErrImagePull",
+    "category": "ImagePull",
+    "root_cause": "The container image \"nginx:does-not-exist\" could not be found in the registry.",
+    "passed": true
+  },
+  {
+    "scenario": "bad-registry",
+    "status": "ErrImagePull",
+    "category": "ImagePull",
+    "root_cause": "The pod cannot pull the image because the registry host \"registry.invalid\" cannot be resolved, causing a DNS lookup failure.",
+    "passed": true
+  },
+  {
+    "scenario": "invalid-image-name",
+    "status": "InvalidImageName",
+    "category": "ImagePull",
+    "root_cause": "The pod\u2019s image name \"nginx::bad\" is not a valid Docker image reference, causing the image pull to fail.",
+    "passed": true
+  },
+  {
+    "scenario": "missing-env-crash",
+    "status": "Error",
+    "category": "Config",
+    "root_cause": "The container exits because the required environment variable DB_URL is missing.",
+    "passed": true
+  },
+  {
+    "scenario": "db-unreachable",
+    "status": "Error",
+    "category": "CrashLoop",
+    "root_cause": "The application container exits immediately because it cannot connect to the Postgres database at host \"db\" on port 5432, resulting in a connection refused error.",
+    "passed": true
+  },
+  {
+    "scenario": "oom",
+    "status": "OOMKilled",
+    "category": "OOMKilled",
+    "root_cause": "The container was killed because it requested 200\u202fMiB of memory with the stress command, but the pod\u2019s memory limit was set to only 50\u202fMiB.",
+    "passed": true
+  },
+  {
+    "scenario": "bad-command",
+    "status": "RunContainerError",
+    "category": "CrashLoop",
+    "root_cause": "The container fails to start because the specified command \"/bin/doesnotexist\" does not exist in the image, causing an exec error during container init.",
+    "passed": true
+  },
+  {
+    "scenario": "pending-cpu",
+    "passed": false,
+    "note": "error: Expecting ',' delimiter: line 1 column 325 (char 324)"
+  },
+  {
+    "scenario": "missing-configmap",
+    "status": "CreateContainerConfigError",
+    "category": "Config",
+    "root_cause": "The pod cannot start because the ConfigMap \"app-config\" referenced in its spec does not exist.",
+    "passed": true
+  },
+  {
+    "scenario": "missing-secret",
+    "status": "CreateContainerConfigError",
+    "category": "Config",
+    "root_cause": "The pod cannot start because the referenced secret \"db-credentials\" does not exist in the namespace.",
+    "passed": true
+  }
+]

@@ -41,10 +41,12 @@ def get_pod_logs(pod, namespace="default", tail=50):
     try:
         return v1.read_namespaced_pod_log(
             pod, namespace, tail_lines=tail, previous=True
-        )
+        ) or ""
     except client.ApiException:
         try:
-            return v1.read_namespaced_pod_log(pod, namespace, tail_lines=tail)
+            return v1.read_namespaced_pod_log(
+                pod, namespace, tail_lines=tail
+            ) or ""
         except client.ApiException as e:
             return f"(no logs available: {e.reason})"
 

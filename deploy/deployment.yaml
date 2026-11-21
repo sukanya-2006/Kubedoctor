@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubedoctor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubedoctor
+  template:
+    metadata:
+      labels:
+        app: kubedoctor
+    spec:
+      serviceAccountName: kubedoctor
+      containers:
+        - name: kubedoctor
+          image: kubedoctor:0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: kubedoctor-env
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubedoctor
+spec:
+  selector:
+    app: kubedoctor
+  ports:
+    - port: 80
+      targetPort: 8000

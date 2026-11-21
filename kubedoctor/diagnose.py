@@ -51,7 +51,7 @@ def diagnose(pod, namespace="default"):
     reason = _reason_for(pod, namespace)
     evidence = {
         "pod": pod,
-        "logs": k.get_pod_logs(pod, namespace)[-2000:],
+                "logs": (k.get_pod_logs(pod, namespace) or "")[-2000:],
         "status_reason": reason,
         "hint": HINTS.get(reason, ""),
         "describe": k.describe_pod(pod, namespace),
