@@ -101,6 +101,11 @@ Run the benchmark: `python -m benchmark.run_benchmark`
 
 MCP server: `python -m kubedoctor.mcp_server`
 
+
+![CI](https://github.com/sukanya-2006/Kubedoctor/actions/workflows/ci.yml/badge.svg)
+
+
+
 ## Limitations
 
 - Scenarios are synthetic, not real production incidents.
