@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubedoctor-watcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubedoctor-watcher
+  template:
+    metadata:
+      labels:
+        app: kubedoctor-watcher
+    spec:
+      serviceAccountName: kubedoctor
+      containers:
+        - name: watcher
+          image: kubedoctor:0.3
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "kubedoctor.watch"]
+          envFrom:
+            - secretRef:
+                name: kubedoctor-env

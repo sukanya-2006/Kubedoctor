@@ -3,7 +3,7 @@
     "scenario": "bad-tag",
     "status": "ErrImagePull",
     "category": "ImagePull",
-    "root_cause": "The container image \"nginx:does-not-exist\" could not be found in the registry.",
+    "root_cause": "The pod cannot pull the specified image because the image \"nginx:does-not-exist\" does not exist in the registry.",
     "passed": true
   },
   {
@@ -17,41 +17,43 @@
     "scenario": "invalid-image-name",
     "status": "InvalidImageName",
     "category": "ImagePull",
-    "root_cause": "The pod\u2019s image name \"nginx::bad\" is not a valid Docker image reference, causing the image pull to fail.",
+    "root_cause": "The pod\u2019s container image reference \"nginx::bad\" is not a valid Docker image name, causing the image pull to fail.",
     "passed": true
   },
   {
     "scenario": "missing-env-crash",
     "status": "Error",
     "category": "Config",
-    "root_cause": "The container exits because the required environment variable DB_URL is missing.",
+    "root_cause": "The container exits immediately because the required environment variable DB_URL is not set.",
     "passed": true
   },
   {
     "scenario": "db-unreachable",
     "status": "Error",
     "category": "CrashLoop",
-    "root_cause": "The application container exits immediately because it cannot connect to the Postgres database at host \"db\" on port 5432, resulting in a connection refused error.",
+    "root_cause": "The application container exits immediately because it cannot connect to the PostgreSQL service at db:5432, causing a CrashLoopBackOff.",
     "passed": true
   },
   {
     "scenario": "oom",
     "status": "OOMKilled",
     "category": "OOMKilled",
-    "root_cause": "The container was killed because it requested 200\u202fMiB of memory with the stress command, but the pod\u2019s memory limit was set to only 50\u202fMiB.",
+    "root_cause": "The pod\u2019s container exceeded its memory limit (50Mi) while trying to allocate 200Mi of memory with the stress command, causing an OOMKilled event.",
     "passed": true
   },
   {
     "scenario": "bad-command",
     "status": "RunContainerError",
     "category": "CrashLoop",
-    "root_cause": "The container fails to start because the specified command \"/bin/doesnotexist\" does not exist in the image, causing an exec error during container init.",
+    "root_cause": "The container fails to start because the specified command \"/bin/doesnotexist\" does not exist in the image, causing an exec error.",
     "passed": true
   },
   {
     "scenario": "pending-cpu",
-    "passed": false,
-    "note": "error: Expecting ',' delimiter: line 1 column 325 (char 324)"
+    "status": "Pending",
+    "category": "Scheduling",
+    "root_cause": "The pod cannot be scheduled because the requested CPU (1k) exceeds the available CPU on the only node.",
+    "passed": true
   },
   {
     "scenario": "missing-configmap",
@@ -64,7 +66,7 @@
     "scenario": "missing-secret",
     "status": "CreateContainerConfigError",
     "category": "Config",
-    "root_cause": "The pod cannot start because the referenced secret \"db-credentials\" does not exist in the namespace.",
+    "root_cause": "The pod cannot start because the secret \"db-credentials\" referenced in the container\u2019s environment variable is missing.",
     "passed": true
   }
 ]
