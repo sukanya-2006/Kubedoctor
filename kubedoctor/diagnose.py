@@ -76,6 +76,7 @@ import os
 
 from dotenv import load_dotenv
 from groq import Groq
+from kubedoctor.redact import redact
 
 from . import k8s_tools as k
 
@@ -123,18 +124,20 @@ def _reason_for(pod, namespace):
 def _parse_json(text):
     start, end = text.find("{"), text.rfind("}")
     return json.loads(text[start:end + 1])
-
-
-def diagnose(pod, namespace="default"):
+def build_evidence(pod, namespace="default"):
     reason = _reason_for(pod, namespace)
-    evidence = {
+    return {
         "pod": pod,
-        "logs": (k.get_pod_logs(pod, namespace) or "")[-2000:],
+        "logs": redact((k.get_pod_logs(pod, namespace) or "")[-2000:]),
         "status_reason": reason,
         "hint": HINTS.get(reason, ""),
         "describe": k.describe_pod(pod, namespace),
-        "events": k.get_pod_events(pod, namespace)[-15:],
+        "events": [redact(e) for e in k.get_pod_events(pod, namespace)[-15:]],
     }
+
+
+def diagnose(pod, namespace="default"):
+    evidence = build_evidence(pod, namespace)
     messages = [
         {"role": "system", "content": SYSTEM},
         {"role": "user", "content": json.dumps(evidence, default=str)},

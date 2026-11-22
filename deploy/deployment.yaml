@@ -15,7 +15,7 @@ spec:
       serviceAccountName: kubedoctor
       containers:
         - name: kubedoctor
-          image: kubedoctor:0.3
+          image: kubedoctor:0.4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
