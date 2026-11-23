@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python-checks:
+    name: Python checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Syntax check
+        run: python -m compileall -q kubedoctor benchmark
+
+      - name: Lint (syntax errors and undefined names)
+        run: ruff check . --select E9,F63,F7,F82
+
+      - name: Validate Kubernetes YAML
+        run: |
+          python - <<'EOF'
+          import glob
+          import yaml
+
+          files = glob.glob("deploy/*.yaml") + glob.glob("chaos/*.yaml") + ["kind-config.yaml"]
+          for path in files:
+              with open(path) as f:
+                  docs = [d for d in yaml.safe_load_all(f) if d]
+              for d in docs:
+                  assert "kind" in d, f"{path}: missing 'kind'"
+              print("ok", path, [d["kind"] for d in docs])
+          EOF
+
+  docker-build:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t kubedoctor:ci .
